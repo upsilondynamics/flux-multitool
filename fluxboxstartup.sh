@@ -129,7 +129,7 @@ function launchToolBox() {
    echo "Launching, please wait.... Note: You can press CTRL-C at any time to return to the main menu"
    
    sleep 3
-   ./flux-multitool/multitoolbox.sh
+   ~/flux-multitool/multitoolbox.sh
   else
    showIntro
    showMenu
