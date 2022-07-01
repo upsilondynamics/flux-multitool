@@ -12,20 +12,10 @@ NC='\033[0m'
 
 
 # function definitions
-function lockMenu() {
- touch ~/menu.lock
-}
-
-function unLockMenu() {
- if [[ -f ~/menu.lock ]]
- then
-     rm ~/menu.lock
- fi
-}
 
 function showIntro() {
  clear
- cat fluxart.txt
+ cat ~/flux-multitool/fluxart.txt
  sleep 2
  clear
 
@@ -89,7 +79,6 @@ function showMenu() {
 
      echo -e "\n Success, new name is $HOSTNAME"
      sleep 3
-     lockMenu
    ;;
    4)
      read -p "Would you like to restart Y/N?" -n 1 -r
@@ -138,10 +127,9 @@ function launchToolBox() {
   if [[ $REPLY =~ ^[Yy]$ ]]
   then
    echo "Launching, please wait.... Note: You can press CTRL-C at any time to return to the main menu"
-
-   lockMenu
+   
    sleep 3
-   sudo bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/multitoolbox.sh)
+   ./flux-multitool/multitoolbox.sh
   else
    showIntro
    showMenu
