@@ -12,6 +12,17 @@ NC='\033[0m'
 
 
 # function definitions
+function lockMenu() {
+ touch ~/menu.lock
+}
+
+function unLockMenu() {
+ if [[ -f ~/menu.lock ]]
+ then
+     rm ~/menu.lock
+ fi
+}
+
 function showIntro() {
  clear
  cat fluxart.txt
@@ -21,7 +32,11 @@ function showIntro() {
  echo -e "${BLUE} ========================= WELCOME TO FLUXBOX ==========================="
  echo -e "${CYAN} ======================== www.fluxnodestore.com =========================\r\n"
 
- echo -e "FluxBox Name: $HOSTNAME\n"
+ echo -e "FluxBox Name:\t$HOSTNAME"
+ echo -e "IP Address:\t$(hostname -I)"
+ echo -e "Public IP:\t$(dig +short myip.opendns.com @resolver1.opendns.com)"
+
+ echo -e "\n"
  echo -e "${YELLOW} ======================= PROCESSOR INFORMATION ==========================${WHITE}"
  lscpu | grep -E "Model name|^CPU\(s\):|Architecture:|Thread\(s\) per core"
 
@@ -38,11 +53,12 @@ function showIntro() {
 
 function showMenu() {
 
-  echo -e "\r\n${SEA} ============================= MAIN MENU ================================${WHITE}"  
-  echo -e " 1. Launch Fluxnode Setup"
+  echo -e "${SEA} ============================= MAIN MENU ================================${WHITE}"  
+  echo -e " 1. Launch FluxNode Setup"
   echo -e " 2. Change Password"
   echo -e " 3. Rename Box"
   echo -e " 4. Restart FluxBox"
+  echo -e " 5. Setup Wifi"
 
   echo -e "\n"
 
@@ -61,6 +77,7 @@ function showMenu() {
    ;;
    3)
      clear
+
      echo "Current Name: $HOSTNAME"
      read -p "Enter new name : " newName
      echo -e "Setting to $newName... Please wait a moment"
@@ -72,6 +89,7 @@ function showMenu() {
 
      echo -e "\n Success, new name is $HOSTNAME"
      sleep 3
+     lockMenu
    ;;
    4)
      read -p "Would you like to restart Y/N?" -n 1 -r
@@ -89,7 +107,12 @@ function showMenu() {
       done
 
       sudo shutdown -r now
-     fi  
+    fi
+   ;;
+   5)
+     clear
+     sudo python3 easywifi/easywifi.py
+
   esac
 
   showIntro
@@ -108,13 +131,17 @@ function launchToolBox() {
   echo -e " 6. Enable UpnP on Your Router so traffic can be re-directed on the proper port to your node"
   echo -e "\n"
 
-  read -p "Would you like to continue Y/N?" -n 1 -r
+  read -p "Would you like to continue Y/N? " -n 1 -r
 
   echo -e "${NC}"
 
   if [[ $REPLY =~ ^[Yy]$ ]]
   then
-   bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/multitoolbox.sh)
+   echo "Launching, please wait.... Note: You can press CTRL-C at any time to return to the main menu"
+
+   lockMenu
+   sleep 3
+   sudo bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/multitoolbox.sh)
   else
    showIntro
    showMenu
