@@ -100,7 +100,7 @@ function showMenu() {
    ;;
    5)
      clear
-     sudo python3 easywifi/easywifi.py
+     sudo python3 ~/flux-multitool/easywifi/easywifi.py
 
   esac
 

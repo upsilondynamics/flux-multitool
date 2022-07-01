@@ -1,3 +1,2 @@
 #!/bin/bash
-cd ~
-./fluxboxstartup.sh
+~/flux-multitool/fluxboxstartup.sh
