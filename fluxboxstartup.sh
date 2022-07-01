@@ -29,7 +29,7 @@ function showIntro() {
  sleep 2
  clear
 
- echo -e "${BLUE} ======================== WELCOME TO FLUXBOX V1.0 ======================="
+ echo -e "${BLUE} ======================== WELCOME TO FLUXBOX V1.1 ======================="
  echo -e "${CYAN} ======================== www.fluxnodestore.com =========================\r\n"
 
  echo -e "FluxBox Name:\t$HOSTNAME"
