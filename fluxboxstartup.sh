@@ -36,7 +36,7 @@ function showIntro() {
  lsblk | grep -E "^.*disk"
 
  echo -e "${WHITE}\n *** For Help and Support - fluxnodestore@gmail.com ***" 
- echo -e "${WHITE} *** NOTE: Type ""start"" from the command prompt to get back to this menu at any time ***" 
+ echo -e "${WHITE} *** NOTE: Type \"start\" from the command prompt to get back to this menu at any time ***" 
 }
 
 
