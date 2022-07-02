@@ -2406,7 +2406,10 @@ do
 	echo -e "${GREEN}OS: Ubuntu 16/18/19/20, Debian 9/10 ${NC}"
 	echo -e "${GREEN}Created by: X4MiLX from Flux's team${NC}"
 	echo -e "${GREEN}Special thanks to dk808, CryptoWrench && jriggs28${NC}"
-        echo -e "${CYAN} -- Modified by FluxNodeStore.com all rights reserved to Flux Team v1.0 2022-07-01 --${NC}"
+  echo -e "\n"
+  echo -e "${CYAN} -- Modified by FluxNodeStore.com all rights reserved to Flux Team v1.0 2022-07-01 --${NC}"
+  echo -e "FluxBox Install Run Steps 1-4 In Sequence"
+
 	echo -e "${YELLOW}======================== BASE OPTIONS =============================${NC}"
   echo -e "${CYAN}1  - Restore Flux blockchain from bootstrap${NC}"
 	echo -e "${CYAN}2  - Install FluxNode${NC}"
