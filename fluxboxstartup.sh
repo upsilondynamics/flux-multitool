@@ -126,7 +126,7 @@ function launchToolBox() {
 
   if [[ $REPLY =~ ^[Yy]$ ]]
   then
-   echo "Launching, please wait.... Note: You can press CTRL-C at any time to return to the main menu"
+   echo "Launching MultiToolBox, please wait...."
    
    sleep 3
    ~/flux-multitool/multitoolbox.sh
