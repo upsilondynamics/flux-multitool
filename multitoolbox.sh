@@ -2396,137 +2396,142 @@ fi
 
 
 
-clear
-sleep 1
-echo -e "${BLUE}"
-figlet -f slant "Multitoolbox"
-echo -e "${YELLOW}================================================================${NC}"
-echo -e "${GREEN}Version: $dversion${NC}"
-echo -e "${GREEN}OS: Ubuntu 16/18/19/20, Debian 9/10 ${NC}"
-echo -e "${GREEN}Created by: X4MiLX from Flux's team${NC}"
-echo -e "${GREEN}Modified for FluxNodeStore.com all rights reserved to Flux Team v1.0 2022-07-01${NC}"
-echo -e "${GREEN}Special thanks to dk808, CryptoWrench && jriggs28${NC}"
-echo -e "${YELLOW}================================================================${NC}"
-echo -e "${CYAN}1  - Install FluxNode${NC}"
-echo -e "${CYAN}2  - FluxNode analyzer and fixer${NC}"
-echo -e "${CYAN}3  - Install watchdog for FluxNode${NC}"
-echo -e "${CYAN}4  - Restore Flux blockchain from bootstrap${NC}"
-echo -e "${CYAN}5  - Create FluxNode installation config file${NC}"
-echo -e "${CYAN}6  - Re-install FluxOS${NC}"
-echo -e "${CYAN}7  - Flux Daemon Reconfiguration${NC}"
-echo -e "${CYAN}8  - Create Flux daemon service ( for old nodes )${NC}"
-echo -e "${CYAN}9  - Create Self-hosting cron ip service ${NC}"
-echo -e "${CYAN}10 - Replace Zel ID ${NC}"
-echo -e "${CYAN}11 - Install fluxwatchtower for docker images autoupdate${NC}"
-echo -e "${CYAN}12 - Recover corrupted MongoDB database${NC}"
-echo -e "${CYAN}13 - Multinode configuration with UPNP communication (Needs Router with UPNP support)  ${NC}"
-echo -e "${CYAN}14 - Back to main menu  ${NC}"
-echo -e "${YELLOW}================================================================${NC}"
+while [ condition ]
+do
+	clear
+	sleep 1
+	echo -e "${BLUE}"
+	figlet -f slant "Multitoolbox"
+	echo -e "${YELLOW}================================================================${NC}"
+	echo -e "${GREEN}Version: $dversion${NC}"
+	echo -e "${GREEN}OS: Ubuntu 16/18/19/20, Debian 9/10 ${NC}"
+	echo -e "${GREEN}Created by: X4MiLX from Flux's team${NC}"
+	echo -e "${GREEN}Special thanks to dk808, CryptoWrench && jriggs28${NC}"
+        echo -e "${CYAN} -- Modified by FluxNodeStore.com all rights reserved to Flux Team v1.0 2022-07-01 --${NC}"
+	echo -e "${YELLOW}================================================================${NC}"
+	echo -e "${CYAN}1  - Install FluxNode${NC}"
+	echo -e "${CYAN}2  - FluxNode analyzer and fixer${NC}"
+	echo -e "${CYAN}3  - Install watchdog for FluxNode${NC}"
+	echo -e "${CYAN}4  - Restore Flux blockchain from bootstrap${NC}"
+	echo -e "${CYAN}5  - Create FluxNode installation config file${NC}"
+	echo -e "${CYAN}6  - Re-install FluxOS${NC}"
+	echo -e "${CYAN}7  - Flux Daemon Reconfiguration${NC}"
+	echo -e "${CYAN}8  - Create Flux daemon service ( for old nodes )${NC}"
+	echo -e "${CYAN}9  - Create Self-hosting cron ip service ${NC}"
+	echo -e "${CYAN}10 - Replace Zel ID ${NC}"
+	echo -e "${CYAN}11 - Install fluxwatchtower for docker images autoupdate${NC}"
+	echo -e "${CYAN}12 - Recover corrupted MongoDB database${NC}"
+	echo -e "${CYAN}13 - Multinode configuration with UPNP communication (Needs Router with UPNP support)  ${NC}"
+	echo -e "${CYAN}14 - Back to main menu  ${NC}"
+	echo -e "${YELLOW}================================================================${NC}"
 
-read -rp "Pick an option and hit ENTER: "
+	read -rp "Pick an option and hit ENTER: "
 
-  case "$REPLY" in
+	  case "$REPLY" in
 
-# 1)  
-#    clear
-#    sleep 1
-#    install_docker
-# ;;
- 1) 
-    clear
-    sleep 1
-    install_node
- ;;
- 2)     
-    clear
-    sleep 1
-    analyzer_and_fixer
- ;;
-  3)  
-    clear
-    sleep 1
-    install_watchdog   
- ;;
- 
-# 5)  
-  #  clear
-   #sleep 1
-    #mongodb_bootstrap     
-# ;;
-  4)  
-    clear
-    sleep 1
-    flux_daemon_bootstrap     
- ;; 
-  5)
-    clear
-    sleep 1
-    create_config
- ;;
-   6)
-    clear
-    sleep 1
-    install_flux
- ;;
- 7)
-   clear
-   sleep 1
-   daemon_reconfiguration
-   
- ;;
- 
-#  10)
- #  clear
- #  sleep 1
- #  kda_bootstrap
-   
-# ;;
- 
- 8)
-  clear
-  sleep 1
-  create_service
-  create_service_scripts
- ;;
- 
-  9)
-  clear
-  sleep 1
-  selfhosting
- ;;
- 
-   10)
-  clear
-  sleep 1
-  replace_zelid
-  echo -e ""
- ;;
- 
-    11)
-  clear
-  sleep 1
-  install_watchtower
-  echo -e ""
- ;;
- 
-     12)
-  clear
-  sleep 1
-  mongod_db_fix
-  echo -e ""
- ;;
- 
-   13)
-  clear
-  sleep 1
-  multinode
-  echo -e ""
- ;;
- 
+	# 1)  
+	#    clear
+	#    sleep 1
+	#    install_docker
+	# ;;
+	 1) 
+	    clear
+	    sleep 1
+	    install_node
+	 ;;
+	 2)     
+	    clear
+	    sleep 1
+	    analyzer_and_fixer
+	 ;;
+	  3)  
+	    clear
+	    sleep 1
+	    install_watchdog   
+	 ;;
+	 
+	# 5)  
+	  #  clear
+	   #sleep 1
+	    #mongodb_bootstrap     
+	# ;;
+	  4)  
+	    clear
+	    sleep 1
+	    flux_daemon_bootstrap     
+	 ;; 
+	  5)
+	    clear
+	    sleep 1
+	    create_config
+	 ;;
+	   6)
+	    clear
+	    sleep 1
+	    install_flux
+	 ;;
+	 7)
+	   clear
+	   sleep 1
+	   daemon_reconfiguration
+	   
+	 ;;
+	 
+	#  10)
+	 #  clear
+	 #  sleep 1
+	 #  kda_bootstrap
+	   
+	# ;;
+	 
+	 8)
+	  clear
+	  sleep 1
+	  create_service
+	  create_service_scripts
+	 ;;
+	 
+	  9)
+	  clear
+	  sleep 1
+	  selfhosting
+	 ;;
+	 
+	   10)
+	  clear
+	  sleep 1
+	  replace_zelid
+	  echo -e ""
+	 ;;
+	 
+	    11)
+	  clear
+	  sleep 1
+	  install_watchtower
+	  echo -e ""
+	 ;;
+	 
+	     12)
+	  clear
+	  sleep 1
+	  mongod_db_fix
+	  echo -e ""
+	 ;;
+	 
+	   13)
+	  clear
+	  sleep 1
+	  multinode
+	  echo -e ""
+	 ;;
+	 
 
- 14)
-    start
- ;;
+	 14)
+	    start
+	 ;;
 
-    esac
+	    esac
+
+	read -rp "<< PRESS ENTER TO RETURN TO MENU >>"
+done
 
