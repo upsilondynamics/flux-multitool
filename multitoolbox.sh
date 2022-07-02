@@ -1760,11 +1760,9 @@ fi
       echo -e "${WORNING} ${CYAN}First install FluxNode...${NC}"
       echo -e "${WORNING} ${CYAN}Operation stopped...${NC}"
       echo -e ""      
+    else      
+      bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/multinode.sh)
     fi  
-    
-    sleep 15
-    bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/multinode.sh)
-
 }
 
 function install_docker(){
