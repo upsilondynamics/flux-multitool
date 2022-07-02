@@ -58,6 +58,7 @@ function showMenu() {
       clear
       sleep 1
       launchToolBox
+      exit 0
    ;;
    2)
       clear
@@ -135,6 +136,8 @@ function launchToolBox() {
   fi  
 }
 
+# Login as sudo
+sudo su -
 
 # Start Process
 showIntro

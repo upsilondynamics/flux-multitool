@@ -1,3 +1,5 @@
+import os
+import time
 import subprocess
 from shlex import split
 from getpass import getpass
@@ -26,14 +28,24 @@ def getssid(netname):
     p2 = subprocess.Popen(split("grep -i "+str(netname)), stdin=p1.stdout, stdout=subprocess.PIPE)
     ss=p2.communicate()[0].decode('utf-8')
     return str(ss.split()[1])
-while True:
-    connectedNetworks = subprocess.run(['nmcli', "d", "|", "grep", "connected"], stdout=subprocess.PIPE)
-    print(connectedNetworks)
 
-    print("\n")
+while True:
+    os.system('clear')
+
+    print(bcolors.OKBLUE)
+    print("=======================================")
+    print("              WIFI SETUP               ")
+    print("=======================================")
+    print(bcolors.ENDC)
+
+    result = subprocess.run(['nmcli', "d"], stdout=subprocess.PIPE)
+    print(result.stdout.decode('utf-8'))
+
+    print(bcolors.OKBLUE)
     print("=======================================")
     print("                  MENU                 ")
     print("=======================================")
+    print(bcolors.ENDC)
     print("1) Connect to WIFI")    
     print("2) Disconnect from WIFI")
     print("3) Exit back to menu")
@@ -44,9 +56,11 @@ while True:
         scan_networks()
 
         network = input("Enter SSID: ")
-        result = subprocess.run(['nmcli', "d", "wifi", "connect", network], stdout=subprocess.PIPE)
+        password = getpass()
+        result = subprocess.run(['nmcli', "d", "wifi", "connect", network, "password", str(password)], stdout=subprocess.PIPE)
         print(result.stdout.decode('utf-8'))
-
+        time.sleep(3)
+        
     elif choice == "2":
         scan_networks()
 
@@ -55,8 +69,9 @@ while True:
         contodel = str(input("Enter SSID: "))
         result2 = subprocess.run(['nmcli', "connection", "delete", contodel], stdout=subprocess.PIPE)
         print(result2.stdout.decode('utf-8'))
+        time.sleep(3)
 
-    elif choice == "2":
+    elif choice == "3":
         exit()
 
     else:

@@ -1,2 +1,3 @@
 #!/bin/bash
+sudo su -
 ~/flux-multitool/fluxboxstartup.sh
