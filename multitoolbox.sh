@@ -2426,7 +2426,9 @@ do
 	echo -e "${CYAN}11 - Replace Zel ID ${NC}"
 	echo -e "${CYAN}12 - Install fluxwatchtower for docker images autoupdate${NC}"
 	echo -e "${CYAN}13 - Recover corrupted MongoDB database${NC}"	
-	echo -e "${CYAN}14 - Back to main menu  ${NC}"
+
+  echo -e "\n ** Enter Option 14 to return back to main FluxBox menu"
+	echo -e "${CYAN}14 - Back to FluxBox main menu  ${NC}"
 	echo -e "${YELLOW}================================================================${NC}"
 
 	read -rp "Pick an option and hit ENTER: "
