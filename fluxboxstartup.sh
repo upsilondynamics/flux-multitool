@@ -42,7 +42,7 @@ function showIntro() {
 
 function showMenu() {
 
-  echo -e "${SEA} ======================FLUX BOX MAIN MENU ===============================${WHITE}"  
+  echo -e "${SEA} ========================= FLUX BOX MAIN MENU ===========================${WHITE}"  
   echo -e " 1. Launch FluxNode Setup"
   echo -e " 2. Change Password"
   echo -e " 3. Rename Box"
