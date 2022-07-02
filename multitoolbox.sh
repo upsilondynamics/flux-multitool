@@ -2407,9 +2407,9 @@ do
   echo -e "\n"  
   echo -e "FluxBox Install Run Steps 1-4 In Sequence"
 
-	echo -e "${YELLOW}======================== BASE OPTIONS =============================${NC}"
-  echo -e "${CYAN}1  - Restore Flux blockchain from bootstrap${NC}"
-	echo -e "${CYAN}2  - Install FluxNode${NC}"
+	echo -e "${YELLOW}======================== BASE OPTIONS =============================${NC}"  
+	echo -e "${CYAN}1  - Install FluxNode${NC}"
+  echo -e "${CYAN}2  - Restore Flux blockchain from bootstrap${NC}"
   echo -e "${CYAN}3  - Multinode configuration with UPNP communication (Needs Router with UPNP support)  ${NC}"
 	echo -e "${CYAN}4  - FluxNode analyzer and fixer${NC}"
 
@@ -2432,16 +2432,16 @@ do
 
 	  case "$REPLY" in
 
-	  1)  
-	    clear
-	    sleep 1
-	    flux_daemon_bootstrap     
-	 ;; 
-	 2) 
+	 1) 
 	    clear
 	    sleep 1
 	    install_node
 	 ;;
+	 2)  
+	    clear
+	    sleep 1
+	    flux_daemon_bootstrap     
+	 ;; 
 	 3)
 	    clear
 	    sleep 1
