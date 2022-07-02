@@ -36,13 +36,13 @@ function showIntro() {
  lsblk | grep -E "^.*disk"
 
  echo -e "${WHITE}\n *** For Help and Support - fluxnodestore@gmail.com ***" 
- echo -e "${WHITE} *** NOTE: Type ${CYAN}\"start\"${WHITE} from the command prompt to get back to this menu at any time ***" 
+ echo -e "${WHITE} *** NOTE: Type ${CYAN}\"start\"${WHITE} from the command prompt to get back to this menu at any time ***\n" 
 }
 
 
 function showMenu() {
 
-  echo -e "${SEA} ============================= MAIN MENU ================================${WHITE}"  
+  echo -e "${SEA} ======================FLUX BOX MAIN MENU ===============================${WHITE}"  
   echo -e " 1. Launch FluxNode Setup"
   echo -e " 2. Change Password"
   echo -e " 3. Rename Box"
