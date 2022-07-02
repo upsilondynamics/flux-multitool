@@ -105,6 +105,15 @@ fi
 #git reset --hard origin/main
 #cd ~
 
+# Pull the latest code from origin
+echo "Updating multi tool from cloud to latest..."
+cd ~/flux-multitool
+git fetch --all
+git reset --hard origin/main
+
+# Switch to home 
+cd ~
+
 export PATH=$PATH:~:~/flux-multitool
 # Check if this is the first bash session, if so launch flux box
 if [[ -z $IS_FIRSTRUN ]]; then
