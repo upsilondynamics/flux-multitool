@@ -2513,6 +2513,6 @@ do
 
 	    esac
 
-	read -rp "<< PRESS ENTER TO RETURN TO MENU >>"
+	read -rp "${WHITE}<<<<< PRESS ENTER TO RETURN TO MENU >>>>>${NC}"
 done
 
