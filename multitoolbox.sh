@@ -1759,8 +1759,7 @@ fi
     if [[ ! -f /home/$USER/zelflux/config/userconfig.js ]]; then
       echo -e "${WORNING} ${CYAN}First install FluxNode...${NC}"
       echo -e "${WORNING} ${CYAN}Operation stopped...${NC}"
-      echo -e ""
-      exit
+      echo -e ""      
     fi  
     
     sleep 15
@@ -2409,19 +2408,20 @@ do
 	echo -e "${GREEN}Special thanks to dk808, CryptoWrench && jriggs28${NC}"
         echo -e "${CYAN} -- Modified by FluxNodeStore.com all rights reserved to Flux Team v1.0 2022-07-01 --${NC}"
 	echo -e "${YELLOW}================================================================${NC}"
-	echo -e "${CYAN}1  - Install FluxNode${NC}"
-	echo -e "${CYAN}2  - FluxNode analyzer and fixer${NC}"
-	echo -e "${CYAN}3  - Install watchdog for FluxNode${NC}"
-	echo -e "${CYAN}4  - Restore Flux blockchain from bootstrap${NC}"
-	echo -e "${CYAN}5  - Create FluxNode installation config file${NC}"
-	echo -e "${CYAN}6  - Re-install FluxOS${NC}"
-	echo -e "${CYAN}7  - Flux Daemon Reconfiguration${NC}"
-	echo -e "${CYAN}8  - Create Flux daemon service ( for old nodes )${NC}"
-	echo -e "${CYAN}9  - Create Self-hosting cron ip service ${NC}"
-	echo -e "${CYAN}10 - Replace Zel ID ${NC}"
-	echo -e "${CYAN}11 - Install fluxwatchtower for docker images autoupdate${NC}"
-	echo -e "${CYAN}12 - Recover corrupted MongoDB database${NC}"
-	echo -e "${CYAN}13 - Multinode configuration with UPNP communication (Needs Router with UPNP support)  ${NC}"
+  echo -e "${CYAN}1  - Restore Flux blockchain from bootstrap${NC}"
+	echo -e "${CYAN}2  - Install FluxNode${NC}"
+  echo -e "${CYAN}3  - Multinode configuration with UPNP communication (Needs Router with UPNP support)  ${NC}"
+	echo -e "${CYAN}4  - FluxNode analyzer and fixer${NC}"
+
+	echo -e "${CYAN}5  - Install watchdog for FluxNode${NC}"	
+	echo -e "${CYAN}6  - Create FluxNode installation config file${NC}"
+	echo -e "${CYAN}7  - Re-install FluxOS${NC}"
+	echo -e "${CYAN}8  - Flux Daemon Reconfiguration${NC}"
+	echo -e "${CYAN}9  - Create Flux daemon service ( for old nodes )${NC}"
+	echo -e "${CYAN}10 - Create Self-hosting cron ip service ${NC}"
+	echo -e "${CYAN}11 - Replace Zel ID ${NC}"
+	echo -e "${CYAN}12 - Install fluxwatchtower for docker images autoupdate${NC}"
+	echo -e "${CYAN}13 - Recover corrupted MongoDB database${NC}"	
 	echo -e "${CYAN}14 - Back to main menu  ${NC}"
 	echo -e "${YELLOW}================================================================${NC}"
 
@@ -2429,103 +2429,81 @@ do
 
 	  case "$REPLY" in
 
-	# 1)  
-	#    clear
-	#    sleep 1
-	#    install_docker
-	# ;;
-	 1) 
-	    clear
-	    sleep 1
-	    install_node
-	 ;;
-	 2)     
-	    clear
-	    sleep 1
-	    analyzer_and_fixer
-	 ;;
-	  3)  
-	    clear
-	    sleep 1
-	    install_watchdog   
-	 ;;
-	 
-	# 5)  
-	  #  clear
-	   #sleep 1
-	    #mongodb_bootstrap     
-	# ;;
-	  4)  
+	  1)  
 	    clear
 	    sleep 1
 	    flux_daemon_bootstrap     
 	 ;; 
-	  5)
+	 2) 
+	    clear
+	    sleep 1
+	    install_node
+	 ;;
+	 3)
+	    clear
+	    sleep 1
+	    multinode
+	    echo -e ""
+	  ;;
+	 4)     
+	    clear
+	    sleep 1
+	    analyzer_and_fixer
+	 ;;
+	  5)  
+	    clear
+	    sleep 1
+	    install_watchdog   
+	 ;;	 
+	  6)
 	    clear
 	    sleep 1
 	    create_config
 	 ;;
-	   6)
+	   7)
 	    clear
 	    sleep 1
 	    install_flux
 	 ;;
-	 7)
+	 8)
 	   clear
 	   sleep 1
-	   daemon_reconfiguration
-	   
-	 ;;
-	 
-	#  10)
-	 #  clear
-	 #  sleep 1
-	 #  kda_bootstrap
-	   
-	# ;;
-	 
-	 8)
+	   daemon_reconfiguration	   
+	 ;;	 
+	 9)
 	  clear
 	  sleep 1
 	  create_service
 	  create_service_scripts
 	 ;;
 	 
-	  9)
+	  10)
 	  clear
 	  sleep 1
 	  selfhosting
 	 ;;
 	 
-	   10)
+	   11)
 	  clear
 	  sleep 1
 	  replace_zelid
 	  echo -e ""
 	 ;;
 	 
-	    11)
+	    12)
 	  clear
 	  sleep 1
 	  install_watchtower
 	  echo -e ""
 	 ;;
 	 
-	     12)
+	     13)
 	  clear
 	  sleep 1
 	  mongod_db_fix
 	  echo -e ""
 	 ;;
-	 
-	   13)
-	  clear
-	  sleep 1
-	  multinode
-	  echo -e ""
-	 ;;
-	 
-
+		 
 	 14)
 	    start
 	 ;;
