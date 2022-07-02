@@ -2420,6 +2420,7 @@ echo -e "${CYAN}11 - Replace Zel ID ${NC}"
 echo -e "${CYAN}12 - Install fluxwatchtower for docker images autoupdate${NC}"
 echo -e "${CYAN}13 - Recover corrupted MongoDB database${NC}"
 echo -e "${CYAN}14 - Multinode configuration with UPNP communication (Needs Router with UPNP support)  ${NC}"
+echo -e "${CYAN}15 - Back to main menu  ${NC}"
 echo -e "${YELLOW}================================================================${NC}"
 
 read -rp "Pick an option and hit ENTER: "
@@ -2523,11 +2524,9 @@ read -rp "Pick an option and hit ENTER: "
  ;;
  
 
-# 8)
-    #clear
-   # sleep 1
-    #install_kernel
-# ;;
+ 15)
+    start
+ ;;
 
     esac
 

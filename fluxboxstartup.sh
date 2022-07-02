@@ -10,7 +10,6 @@ CYAN='\033[1;36m'
 WHITE="\\033[1;97m"
 NC='\033[0m'
 
-
 # function definitions
 
 function showIntro() {
@@ -100,7 +99,7 @@ function showMenu() {
    ;;
    5)
      clear
-     sudo python3 ~/flux-multitool/easywifi/easywifi.py
+     sudo python3 ~/flux-multitool/easywifi.py
 
   esac
 
