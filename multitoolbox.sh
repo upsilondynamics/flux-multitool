@@ -2404,6 +2404,7 @@ echo -e "${YELLOW}==============================================================
 echo -e "${GREEN}Version: $dversion${NC}"
 echo -e "${GREEN}OS: Ubuntu 16/18/19/20, Debian 9/10 ${NC}"
 echo -e "${GREEN}Created by: X4MiLX from Flux's team${NC}"
+echo -e "${GREEN}Modified for FluxNodeStore.com all rights reserved to Flux Team v1.0 2022-07-01${NC}"
 echo -e "${GREEN}Special thanks to dk808, CryptoWrench && jriggs28${NC}"
 echo -e "${YELLOW}================================================================${NC}"
 echo -e "${CYAN}1  - Install FluxNode${NC}"
