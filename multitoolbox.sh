@@ -2406,43 +2406,42 @@ echo -e "${GREEN}OS: Ubuntu 16/18/19/20, Debian 9/10 ${NC}"
 echo -e "${GREEN}Created by: X4MiLX from Flux's team${NC}"
 echo -e "${GREEN}Special thanks to dk808, CryptoWrench && jriggs28${NC}"
 echo -e "${YELLOW}================================================================${NC}"
-echo -e "${CYAN}1  - Install Docker${NC}"
-echo -e "${CYAN}2  - Install FluxNode${NC}"
-echo -e "${CYAN}3  - FluxNode analyzer and fixer${NC}"
-echo -e "${CYAN}4  - Install watchdog for FluxNode${NC}"
-echo -e "${CYAN}5  - Restore Flux blockchain from bootstrap${NC}"
-echo -e "${CYAN}6  - Create FluxNode installation config file${NC}"
-echo -e "${CYAN}7  - Re-install FluxOS${NC}"
-echo -e "${CYAN}8  - Flux Daemon Reconfiguration${NC}"
-echo -e "${CYAN}9  - Create Flux daemon service ( for old nodes )${NC}"
-echo -e "${CYAN}10 - Create Self-hosting cron ip service ${NC}"
-echo -e "${CYAN}11 - Replace Zel ID ${NC}"
-echo -e "${CYAN}12 - Install fluxwatchtower for docker images autoupdate${NC}"
-echo -e "${CYAN}13 - Recover corrupted MongoDB database${NC}"
-echo -e "${CYAN}14 - Multinode configuration with UPNP communication (Needs Router with UPNP support)  ${NC}"
-echo -e "${CYAN}15 - Back to main menu  ${NC}"
+echo -e "${CYAN}1  - Install FluxNode${NC}"
+echo -e "${CYAN}2  - FluxNode analyzer and fixer${NC}"
+echo -e "${CYAN}3  - Install watchdog for FluxNode${NC}"
+echo -e "${CYAN}4  - Restore Flux blockchain from bootstrap${NC}"
+echo -e "${CYAN}5  - Create FluxNode installation config file${NC}"
+echo -e "${CYAN}6  - Re-install FluxOS${NC}"
+echo -e "${CYAN}7  - Flux Daemon Reconfiguration${NC}"
+echo -e "${CYAN}8  - Create Flux daemon service ( for old nodes )${NC}"
+echo -e "${CYAN}9  - Create Self-hosting cron ip service ${NC}"
+echo -e "${CYAN}10 - Replace Zel ID ${NC}"
+echo -e "${CYAN}11 - Install fluxwatchtower for docker images autoupdate${NC}"
+echo -e "${CYAN}12 - Recover corrupted MongoDB database${NC}"
+echo -e "${CYAN}13 - Multinode configuration with UPNP communication (Needs Router with UPNP support)  ${NC}"
+echo -e "${CYAN}14 - Back to main menu  ${NC}"
 echo -e "${YELLOW}================================================================${NC}"
 
 read -rp "Pick an option and hit ENTER: "
 
   case "$REPLY" in
 
- 1)  
-    clear
-    sleep 1
-    install_docker
- ;;
- 2) 
+# 1)  
+#    clear
+#    sleep 1
+#    install_docker
+# ;;
+ 1) 
     clear
     sleep 1
     install_node
  ;;
- 3)     
+ 2)     
     clear
     sleep 1
     analyzer_and_fixer
  ;;
-  4)  
+  3)  
     clear
     sleep 1
     install_watchdog   
@@ -2453,22 +2452,22 @@ read -rp "Pick an option and hit ENTER: "
    #sleep 1
     #mongodb_bootstrap     
 # ;;
-  5)  
+  4)  
     clear
     sleep 1
     flux_daemon_bootstrap     
  ;; 
-  6)
+  5)
     clear
     sleep 1
     create_config
  ;;
-   7)
+   6)
     clear
     sleep 1
     install_flux
  ;;
- 8)
+ 7)
    clear
    sleep 1
    daemon_reconfiguration
@@ -2482,41 +2481,41 @@ read -rp "Pick an option and hit ENTER: "
    
 # ;;
  
- 9)
+ 8)
   clear
   sleep 1
   create_service
   create_service_scripts
  ;;
  
-  10)
+  9)
   clear
   sleep 1
   selfhosting
  ;;
  
-   11)
+   10)
   clear
   sleep 1
   replace_zelid
   echo -e ""
  ;;
  
-    12)
+    11)
   clear
   sleep 1
   install_watchtower
   echo -e ""
  ;;
  
-     13)
+     12)
   clear
   sleep 1
   mongod_db_fix
   echo -e ""
  ;;
  
-   14)
+   13)
   clear
   sleep 1
   multinode
@@ -2524,7 +2523,7 @@ read -rp "Pick an option and hit ENTER: "
  ;;
  
 
- 15)
+ 14)
     start
  ;;
 
