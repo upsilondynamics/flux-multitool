@@ -112,15 +112,15 @@ function launchToolBox() {
 
   echo -e "\r\n${YELLOW} ============================= IMPORTANT ================================${WHITE}"
   echo -e " Before you proceed, please ensure you have the following information from your Zelcore Wallet\n"
-  echo -e " 1. You have sent at least 1000 FLUX from your Zelcore FLUX Wallet to ITSELF (Receiving Address)"
+  echo -e " ${BLUE}1. You have sent at least 1000 FLUX from your Zelcore FLUX Wallet to ITSELF (Receiving Address)"
   echo -e " 2. Your Zelcore Id (Apps -> Zelcore ID -> Tap QR Code)"
   echo -e " 3. Your FluxNode Identity Key"
   echo -e " 4. Your FluxNode Collateral TX ID"
   echo -e " 5. Your FluxNode Output Index"
   echo -e " 6. Enable UpnP on Your Router so traffic can be re-directed on the proper port to your node"
-  echo -e "\n"
+  echo -e "${NC}\n"
 
-  read -p "Would you like to continue Y/N? " -n 1 -r
+  read -p "${WHITE}Would you like to continue Y/N? " -n 1 -r
 
   echo -e "${NC}"
 
