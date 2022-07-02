@@ -35,8 +35,7 @@ function showIntro() {
  echo -e "\r\n${YELLOW} ======================= STORAGE INFORMATION ============================${WHITE}"
  lsblk | grep -E "^.*disk"
 
- echo -e "${WHITE}\r\n For Help and Support - fluxnodestore@gmail.com\r\n\r\n"
- echo -e "\n${NC}" 
+ echo -e "${WHITE}\r\n For Help and Support - fluxnodestore@gmail.com\n" 
 }
 
 
