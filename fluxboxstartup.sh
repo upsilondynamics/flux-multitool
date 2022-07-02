@@ -118,9 +118,9 @@ function launchToolBox() {
   echo -e " 4. Your FluxNode Collateral TX ID"
   echo -e " 5. Your FluxNode Output Index"
   echo -e " 6. Enable UpnP on Your Router so traffic can be re-directed on the proper port to your node"
-  echo -e "${NC}\n"
+  echo -e "${NC}\n${WHITE}"
 
-  read -p "${WHITE}Would you like to continue Y/N? " -n 1 -r
+  read -p "Would you like to continue Y/N? " -n 1 -r
 
   echo -e "${NC}"
 
