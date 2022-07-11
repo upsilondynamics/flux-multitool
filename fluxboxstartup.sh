@@ -135,6 +135,8 @@ function launchToolBox() {
    showMenu
   fi  
 }
+#Allow port 9090
+sudo ufw allow 9090
 
 # Start Process
 showIntro
