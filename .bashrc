@@ -111,7 +111,7 @@ cd ~/flux-multitool
 git fetch --all
 git reset --hard origin/main
 
-chmod +x resetnetwork.sh
+chmod u+x resetnetwork.sh
 
 # Switch to home 
 cd ~
