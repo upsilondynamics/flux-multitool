@@ -47,7 +47,7 @@ function restartNic() {
 
 function installRestartCron() {
   crontab -l > mycron.temp
-  echo "0 */12 * * * ~/flux-multitool/resetnetwork.sh" >> mycron
+  echo "0 */12 * * * ~/flux-multitool/resetnetwork.sh" >> mycron.temp
   crontab mycron.temp
   rm mycron.temp
 }
