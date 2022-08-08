@@ -46,7 +46,10 @@ function restartNic() {
 }
 
 function installRestartCron() {
-  crontab -l > mycron.temp  
+  crontab -l > mycron.temp
+  echo "0 */12 * * * ~/flux-multitool/resetnetwork.sh" >> mycron
+  crontab mycron.temp
+  rm mycron.temp
 }
 
 function showMenu() {
@@ -58,6 +61,7 @@ function showMenu() {
   echo -e " 4. Restart FluxBox"
   echo -e " 5. Setup Wifi"
   echo -e " 6. Refresh Network Interface"
+  echo -e " 7. Install Automated Network Refresh Job"
 
   echo -e "\n"
 
@@ -116,6 +120,11 @@ function showMenu() {
     clear
     echo "Refreshing Network Interface..."
     service docker restart    
+  ;;
+  7)
+   clear
+   echo "Installing crontab restart schedule"
+   installRestartCron
   esac
 
   showIntro
