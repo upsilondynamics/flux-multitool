@@ -39,6 +39,11 @@ function showIntro() {
  echo -e "${WHITE} *** NOTE: Type ${CYAN}\"start\"${WHITE} from the command prompt to get back to this menu at any time ***\n" 
 }
 
+function restartNic() {
+ service docker stop
+ sudo /etc/init.d/networking restart
+ service docker start
+}
 
 function showMenu() {
 
@@ -48,6 +53,7 @@ function showMenu() {
   echo -e " 3. Rename Box"
   echo -e " 4. Restart FluxBox"
   echo -e " 5. Setup Wifi"
+  echo -e " 6. Refresh Network Interface"
 
   echo -e "\n"
 
@@ -101,7 +107,11 @@ function showMenu() {
    5)
      clear
      sudo python3 ~/flux-multitool/easywifi.py
-
+   ;;
+   6)
+    clear
+    echo "Refreshing Network Interface..."
+    service docker restart    
   esac
 
   showIntro
