@@ -14,6 +14,8 @@ NC='\033[0m'
 
 function setPermissions() {
   sudo apt install ifupdown -y
+  mv ~/flux-multitool/grub.txt /etc/default
+  sudo update-grub
   
   chmod u+x ~/flux-multitool/resetnetwork.sh
   chmod +x ~/flux-multitool/resetnetwork.sh
