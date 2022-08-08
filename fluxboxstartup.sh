@@ -45,6 +45,10 @@ function restartNic() {
  service docker start
 }
 
+function installRestartCron() {
+  crontab -l > mycron.temp  
+}
+
 function showMenu() {
 
   echo -e "${SEA} ========================= FLUX BOX MAIN MENU ===========================${WHITE}"  
