@@ -12,6 +12,11 @@ NC='\033[0m'
 
 # function definitions
 
+function setPermissions() {
+  chmod u+x ~/flux-multitool/resetnetwork.sh
+  chmod +x ~/flux-multitool/resetnetwork.sh
+}
+
 function showIntro() {
  clear
  cat ~/flux-multitool/fluxart.txt
@@ -158,8 +163,12 @@ function launchToolBox() {
    showMenu
   fi  
 }
-#Allow port 9090
+
+# Allow port 9090
 sudo ufw allow 9090
+
+# Set basic perimssions on scripts
+setPermissions
 
 # Start Process
 showIntro
