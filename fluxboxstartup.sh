@@ -13,6 +13,8 @@ NC='\033[0m'
 # function definitions
 
 function setPermissions() {
+  sudo apt install ifupdown -y
+  
   chmod u+x ~/flux-multitool/resetnetwork.sh
   chmod +x ~/flux-multitool/resetnetwork.sh
 }
