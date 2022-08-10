@@ -59,6 +59,8 @@ while True:
         password = getpass()
         result = subprocess.run(['nmcli', "d", "wifi", "connect", network, "password", str(password)], stdout=subprocess.PIPE)
         print(result.stdout.decode('utf-8'))
+        
+        result = subprocess.run(['nmcli', "connection", "modify", network, "ipv6.method", "disabled"], stdout=subprocess.PIPE)
         time.sleep(3)
         
     elif choice == "2":
