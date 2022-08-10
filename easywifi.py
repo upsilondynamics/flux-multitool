@@ -61,6 +61,10 @@ while True:
         print(result.stdout.decode('utf-8'))
         
         result = subprocess.run(['nmcli', "connection", "modify", network, "ipv6.method", "disabled"], stdout=subprocess.PIPE)
+        # sudo dhclient -v wlxb4b024340e7a
+
+        result = subprocess.run(['dhclient', "-v", device], stdout=subprocess.PIPE)
+
         time.sleep(3)
         
     elif choice == "2":

@@ -13,6 +13,9 @@ NC='\033[0m'
 # function definitions
 
 function setPermissions() {
+  device=$(nmcli -t con | cut -d ":" -f4)
+  sudo dhclient -v $device
+
   sudo apt install ifupdown -y
   sudo mv -f ~/flux-multitool/grub.config /etc/default/grub
   sudo update-grub
