@@ -1718,7 +1718,7 @@ do
 	echo -e "${BLUE}"
 	figlet -f slant "Multitoolbox"
 	echo -e "${YELLOW}================================================================${NC}"
-	echo -e "${GREEN}Version: $dversion${NC} - (FluxBox v1.1)"
+	echo -e "${GREEN}Version: $dversion${NC} - (FluxBox v1.2 - Aug 17, 2022)"
 	echo -e "${GREEN}OS: Ubuntu 16/18/19/20, Debian 9/10 ${NC}"
 	echo -e "${GREEN}Created by: X4MiLX from Flux's team${NC}"
 	echo -e "${GREEN}Special thanks to dk808, CryptoWrench && jriggs28${NC}"
