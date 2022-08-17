@@ -1,10 +1,20 @@
 #!/bin/bash
 
-BOOTSTRAP_ZIPFILE='flux_explorer_bootstrap.tar.gz'
-BOOTSTRAP_URL_MONGOD='https://fluxnodeservice.com/mongod_bootstrap.tar.gz'
-BOOTSTRAP_ZIPFILE_MONGOD='mongod_bootstrap.tar.gz'
-KDA_BOOTSTRAP_ZIPFILE='kda_bootstrap.tar.gz'
-KDA_BOOTSTRAP_ZIP='http://38.242.202.86:16127/apps/fluxshare/getfile/kda_bootstrap.tar.gz?token=8ba005f55511d806f9d4ec5f56bf5c14ae02a50bfb80f5bdb08a1ded22f7b159'
+if ! [[ -z $1 ]]; then
+    if [[ $BRANCH_ALREADY_REFERENCED != '1' ]]; then
+        export ROOT_BRANCH="$1"
+        export BRANCH_ALREADY_REFERENCED='1'
+        bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/$ROOT_BRANCH/multitoolbox.sh) $ROOT_BRANCH
+        unset ROOT_BRANCH
+        unset BRANCH_ALREADY_REFERENCED
+        exit
+    fi
+else
+    export ROOT_BRANCH='master'
+fi
+
+source /dev/stdin <<< "$(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/$ROOT_BRANCH/flux_common.sh)"
+
 
 if [[ -d /home/$USER/.zelcash ]]; then
    CONFIG_DIR='.zelcash'
@@ -20,205 +30,10 @@ FLUX_APPS_DIR='ZelApps'
 COIN_NAME='zelcash'
 Server_offline=0
 
-#color codes
-RED='\033[1;31m'
-YELLOW='\033[1;33m'
-BLUE="\\033[38;5;27m"
-SEA="\\033[38;5;49m"
-GREEN='\033[1;32m'
-CYAN='\033[1;36m'
-NC='\033[0m'
-
-#emoji codes
-CHECK_MARK="${GREEN}\xE2\x9C\x94${NC}"
-X_MARK="${RED}\xE2\x9C\x96${NC}"
-PIN="${RED}\xF0\x9F\x93\x8C${NC}"
-CLOCK="${GREEN}\xE2\x8C\x9B${NC}"
-ARROW="${SEA}\xE2\x96\xB6${NC}"
-BOOK="${RED}\xF0\x9F\x93\x8B${NC}"
-HOT="${ORANGE}\xF0\x9F\x94\xA5${NC}"
-WORNING="${RED}\xF0\x9F\x9A\xA8${NC}"
-dversion="v7.1"
-
+dversion="v7.3"
 PM2_INSTALL="0"
 zelflux_setting_import="0"
 
-#dialog color
-export NEWT_COLORS='
-title=black,
-'
-
-function bootstrap_server(){
-rand_by_domain=("5" "6" "7" "8" "9" "10" "11")
-richable=()
-richable_eu=()
-richable_us=()
-richable_as=()
-
-i=0
-len=${#rand_by_domain[@]}
-echo -e "${ARROW} ${CYAN}Checking servers availability... ${NC}"
-while [ $i -lt $len ];
-do
-    #echo ${rand_by_domain[$i]}
-    bootstrap_check=$(curl -sSL -m 10 http://cdn-${rand_by_domain[$i]}.runonflux.io/apps/fluxshare/getfile/flux_explorer_bootstrap.json 2>/dev/null | jq -r '.block_height' 2>/dev/null)
-    #echo -e "Height: $bootstrap_check"
-    if [[ "$bootstrap_check" != "" ]]; then
-    #echo -e "Adding:  ${rand_by_domain[$i]}"
-
-       if [[ "${rand_by_domain[$i]}" -ge "8" && "${rand_by_domain[$i]}" -le "11" ]]; then
-         richable_eu+=( ${rand_by_domain[$i]}  )
-       fi
-
-       if [[ "${rand_by_domain[$i]}" -gt "4" &&  "${rand_by_domain[$i]}" -le "7" ]]; then
-         richable_us+=( ${rand_by_domain[$i]}  )
-       fi
-
-        richable+=( ${rand_by_domain[$i]} )
-    fi
-
-    i=$(($i+1))
-done
-
-server_found="1"
-if [[ "$continent" == "EU" ]]; then
-  len_eu=${#richable_eu[@]}
-  if [[ "$len_eu" -gt "0" ]]; then
-    richable=( ${richable_eu[*]} )
-    echo -e "${ARROW} ${CYAN}Reachable servers: ${richable[*]}${NC}"
-  fi
-  if [[ "$len_eu" == "0" ]]; then
-     continent="EU"
-     echo -e "${WORNING} ${CYAN}All Bootstrap in $continent are offline, checking other location...${NC}" && sleep 1
-     len_us=${#richable_us[@]}
-     if [[ "$len_us" -gt "0" ]]; then
-      richable=( ${richable_us[*]} )
-      echo -e "${ARROW} ${CYAN}Reachable servers: ${richable[*]}${NC}"
-     fi
-     if [[ "$len_us" == "0" ]]; then
-       continent="US"
-       echo -e "${WORNING} ${CYAN}All Bootstrap in $continent are offline, checking other location...${NC}" && sleep 1
-       server_found="0"
-     fi
-   fi
-elif [[ "$continent" == "US" ]]; then
-  len_us=${#richable_us[@]}
-  if [[ "$len_us" -gt "0" ]]; then
-    richable=( ${richable_us[*]} )
-    echo -e "${ARROW} ${CYAN}Reachable servers: ${richable[*]}${NC}"
-  fi
-  if [[ "$len_us" == "0" ]]; then
-    continent="US"
-    echo -e "${WORNING} ${CYAN}All Bootstrap in $continent are offline, checking other location...${NC}" && sleep 1
-    len_as=${#richable_as[@]}
-    if [[ "$len_as" -gt "0" ]]; then
-     richable=( ${richable_as[*]} )
-     echo -e "${ARROW} ${CYAN}Reachable servers: ${richable[*]}${NC}"
-    fi
-    if [[ "$len_as" == "0" ]]; then
-      continent="AS"
-      echo -e "${WORNING} ${CYAN}All Bootstrap in $continent are offline, checking other location...${NC}" && sleep 1
-      len_eu=${#richable_eu[@]}
-        if [[ "$len_eu" -gt "0" ]]; then
-          richable=( ${richable_eu[*]} )
-          echo -e "${ARROW} ${CYAN}Reachable servers: ${richable[*]}${NC}"
-        fi
-       if [[ "$len_eu" == "0" ]]; then
-        continent="EU"
-        echo -e "${WORNING} ${CYAN}All Bootstrap in $continent are offline, checking other location...${NC}" && sleep 1
-        server_found="0"
-       fi
-    fi
-  fi
-elif [[ "$continent" == "AS" ]]; then
-  len_as=${#richable_as[@]}
-  if [[ "$len_as" -gt "0" ]]; then
-    richable=( ${richable_as[*]} )
-    echo -e "${ARROW} ${CYAN}Reachable servers: ${richable[*]}${NC}"
-  fi
-  if [[ "$len_as" == "0" ]]; then
-    continent="AS"
-    echo -e "${WORNING} ${CYAN}All Bootstrap in $continent are offline, checking other location...${NC}" && sleep 1
-    len_us=${#richable_us[@]}
-    if [[ "$len_us" -gt "0" ]]; then
-      richable=( ${richable_us[*]} )
-      echo -e "${ARROW} ${CYAN}Reachable servers: ${richable[*]}${NC}"
-    fi
-    if [[ "$len_us" == "0" ]]; then
-      continent="US"
-      echo -e "${WORNING} ${CYAN}All Bootstrap in $continent are offline, checking other location...${NC}" && sleep 1
-      len_eu=${#richable_eu[@]}
-       if [[ "$len_eu" -gt "0" ]]; then
-         richable=( ${richable_eu[*]} )
-         echo -e "${ARROW} ${CYAN}Reachable servers: ${richable[*]}${NC}"
-       fi
-       if [[ "$len_eu" == "0" ]]; then
-        continent="EU"
-        echo -e "${WORNING} ${CYAN}All Bootstrap in $continent are offline, checking other location...${NC}" && sleep 1
-        server_found="0"
-       fi
-    fi
-  fi
-else
-   len=${#richable[@]}
-   if [[ "$len" -gt "0" ]]; then
-         richable=( ${richable[*]} )
-         echo -e "${ARROW} ${CYAN}Reachable servers: ${richable[*]}${NC}"
-   fi
-   
-   if [[ "$len" == "0" ]]; then
-    Server_offline=1
-    return 1
-   fi
-fi
-
-
-
-if [[ "$server_found" == "0" ]]; then
-  len=${#richable[@]}
-  if [[ "$len" == "0" ]]; then
-    Server_offline=1
-    return 1
-  fi
-fi
-
-Server_offline=0
-
-}
-
-function bootstrap_geolocation(){
-
-IP=$WANIP
-ip_output=$(curl -s -m 10 http://ip-api.com/json/$1?fields=status,country,timezone | jq .)
-ip_status=$( jq -r .status <<< "$ip_output")
-
-if [[ "$ip_status" == "success" ]]; then
-country=$(jq -r .country <<< "$ip_output")
-org=$(jq -r .org <<< "$ip_output")
-continent=$(jq -r .timezone <<< "$ip_output")
-else
-country="UKNOW"
-continent="UKNOW"
-fi
-
-continent=$(cut -f1 -d"/" <<< "$continent" )
-
-if [[ "$continent" =~ "Europe" ]]; then
- continent="EU"
-elif [[ "$continent" =~ "America" ]]; then
- continent="US"
-elif [[ "$continent" =~ "Asia" ]]; then
- continent="AS"
-else
- continent="ALL"
-fi
-
-echo -e "${ARROW} ${CYAN}Selecting bootstrap server....${NC}"
-echo -e "${ARROW} ${CYAN}Node Location -> IP:$IP, Country: $country, Continent: $continent ${NC}"
-echo -e "${ARROW} ${CYAN}Searching in $continent....${NC}"
-
-
-}
 
 function config_veryfity(){
 
@@ -242,143 +57,6 @@ function config_veryfity(){
     fi
   
   fi
-
-}
-
-
-function get_ip(){
-
- WANIP=$(curl --silent -m 10 https://api4.my-ip.io/ip | tr -dc '[:alnum:].')
-    
-  if [[ "$WANIP" == "" ]]; then
-   WANIP=$(curl --silent -m 10 https://checkip.amazonaws.com | tr -dc '[:alnum:].')    
-  fi  
-      
-  if [[ "$WANIP" == "" ]]; then
-   WANIP=$(curl --silent -m 10 https://api.ipify.org | tr -dc '[:alnum:].')
-  fi
-
-}
-
-function spinning_timer() {
-    animation=( ⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏ )
-    end=$((SECONDS+NUM))
-    while [ $SECONDS -lt $end ];
-    do
-        for i in "${animation[@]}";
-        do
-	    echo -e ""
-            echo -ne "${RED}\r\033[1A\033[0K$i ${CYAN}${MSG1}${NC}"
-            sleep 0.1
-	    
-        done
-    done
-    echo -ne "${MSG2}"
-}
-
-function string_limit_check_mark_port() {
-if [[ -z "$2" ]]; then
-string="$1"
-string=${string::65}
-else
-string=$1
-string_color=$2
-string_leght=${#string}
-string_leght_color=${#string_color}
-string_diff=$((string_leght_color-string_leght))
-string=${string_color::65+string_diff}
-fi
-echo -e "${PIN}${CYAN}$string[${CHECK_MARK}${CYAN}]${NC}"
-}
-
-function string_limit_check_mark() {
-if [[ -z "$2" ]]; then
-string="$1"
-string=${string::50}
-else
-string=$1
-string_color=$2
-string_leght=${#string}
-string_leght_color=${#string_color}
-string_diff=$((string_leght_color-string_leght))
-string=${string_color::50+string_diff}
-fi
-echo -e "${ARROW} ${CYAN}$string[${CHECK_MARK}${CYAN}]${NC}"
-}
-
-function string_limit_x_mark() {
-if [[ -z "$2" ]]; then
-string="$1"
-string=${string::50}
-else
-string=$1
-string_color=$2
-string_leght=${#string}
-string_leght_color=${#string_color}
-string_diff=$((string_leght_color-string_leght))
-string=${string_color::50+string_diff}
-fi
-echo -e "${ARROW} ${CYAN}$string[${X_MARK}${CYAN}]${NC}"
-}
-
-function tar_file_unpack()
-{
-    echo -e "${ARROW} ${YELLOW}Unpacking bootstrap archive file...${NC}"
-    pv $1 | tar -zx -C $2
-}
-
-function tar_file_pack()
-{
-    echo -e "${ARROW} ${YELLOW}Creating bootstrap archive file...${NC}"
-    tar -czf - $1 | (pv -p --timer --rate --bytes > $2) 2>&1
-}
-
-function check_tar()
-{
-    echo -e "${ARROW} ${YELLOW}Checking  bootstrap file integration...${NC}"
-    
-    if gzip -t "$1" &>/dev/null; then
-    
-        echo -e "${ARROW} ${CYAN}Bootstrap file is valid.................[${CHECK_MARK}${CYAN}]${NC}"
-	
-    else
-    
-        echo -e "${ARROW} ${CYAN}Bootstrap file is corrupted.............[${X_MARK}${CYAN}]${NC}"
-	rm -rf $1
-	
-    fi
-}
-
-function pm2_install(){
-    
-    tmux kill-server > /dev/null 2>&1 && sleep 1
-    echo -e "${ARROW} ${CYAN}PM2 installing...${NC}"
-    npm install pm2@latest -g > /dev/null 2>&1
-    
-    if pm2 -v > /dev/null 2>&1
-    then
-        rm restart_zelflux.sh > /dev/null 2>&1
-     	echo -e "${ARROW} ${CYAN}Configuring PM2...${NC}"
-   	pm2 startup systemd -u $USER > /dev/null 2>&1
-   	sudo env PATH=$PATH:/home/$USER/.nvm/versions/node/$(node -v)/bin pm2 startup systemd -u $USER --hp /home/$USER > /dev/null 2>&1
-   	pm2 start ~/$FLUX_DIR/start.sh --name flux > /dev/null 2>&1
-    	pm2 save > /dev/null 2>&1
-	pm2 install pm2-logrotate > /dev/null 2>&1
-	pm2 set pm2-logrotate:max_size 6M > /dev/null 2>&1
-	pm2 set pm2-logrotate:retain 6 > /dev/null 2>&1
-    	pm2 set pm2-logrotate:compress true > /dev/null 2>&1
-    	pm2 set pm2-logrotate:workerInterval 3600 > /dev/null 2>&1
-    	pm2 set pm2-logrotate:rotateInterval '0 12 * * 0' > /dev/null 2>&1
-	source ~/.bashrc
-	#echo -e "${ARROW} ${CYAN}PM2 version: ${GREEN}v$(pm2 -v)${CYAN} installed${NC}"
-	string_limit_check_mark "PM2 v$(pm2 -v) installed....................................................." "PM2 ${GREEN}v$(pm2 -v)${CYAN} installed....................................................." 
-  	PM2_INSTALL="1"
-
-    else
-
-	 string_limit_x_mark "PM2 was not installed....................................................."
-	 echo
-    fi 
 
 }
 
@@ -434,31 +112,16 @@ else
 echo -e "${PIN}${CYAN}Disable watchdog notification....................................[${CHECK_MARK}${CYAN}]${NC}" && sleep 1
 fi
 
+if [[ ( "$enable_upnp" != "" && "$enable_upnp" != "0" ) ]]; then
+  echo -e "${PIN}${CYAN}Enable UPnP configuration........................................[${CHECK_MARK}${CYAN}]${NC}" && sleep 0.5
+  echo -e "${CYAN}   UPnP Port:  ${GREEN}$upnp_port${NC}" && sleep 0.5
+  echo -e "${CYAN}   Gateway IP: ${GREEN}$gateway_ip${NC}" && sleep 0.5
+fi
 
 fi
 }
 
-function ip_confirm() {
 
-    WANIP=$(curl --silent -m 15 https://api4.my-ip.io/ip | tr -dc '[:alnum:].')
-    
-    if [[ "$WANIP" == "" ]]; then
-      WANIP=$(curl --silent -m 15 https://checkip.amazonaws.com | tr -dc '[:alnum:].')    
-    fi  
-      
-    if [[ "$WANIP" == "" ]]; then
-      WANIP=$(curl --silent -m 15 https://api.ipify.org | tr -dc '[:alnum:].')
-    fi
-      
-        
-    if [[ "$WANIP" == "" ]]; then
-      	echo -e "${ARROW} ${CYAN}IP address could not be found, installation stopped .........[${X_MARK}${CYAN}]${NC}"
-	echo
-	exit
-    fi
-    
-   string_limit_check_mark "IP: $WANIP ..........................................." "IP: ${GREEN}$WANIP${CYAN} ..........................................." 
-}
 
 function install_flux() {
 
@@ -492,8 +155,8 @@ fi
 if [[ $docker_check != 0 ]]; then
 echo -e "${ARROW} ${YELLOW}Detected running docker container...${NC}" && sleep 1
 echo -e "${ARROW} ${CYAN}Removing containers...${NC}"
-sudo aa-remove-unknown && sudo service docker restart > /dev/null 2>&1 && sleep 2 
-sleep 5
+sudo aa-remove-unknown > /dev/null 2>&1 && sudo service docker restart > /dev/null 2>&1 && sleep 2 
+
 #docker ps | grep -Eo "^[0-9a-z]{8,}\b" |
 docker container ls -a | egrep 'zelcash|flux' | grep -Eo "^[0-9a-z]{8,}\b" |
 while read line; do
@@ -768,6 +431,25 @@ else
   else
       kda_address="kadena:$KDA_A?chainid=0"
   fi
+
+  if whiptail --yesno "Would you like to enable UPnP for this node?" 8 65; then
+    enable_upnp='1'
+    gateway_ip=$(whiptail --inputbox "Enter your UPnP Gateway IP: (This is usually your router)" 8 85 3>&1 1>&2 2>&3)
+    upnp_port=$(whiptail --title "Enter your FluxOS UPnP Port" --radiolist \
+      "Use the UP/DOWN arrows to highlight the port you want. Press Spacebar on the port you want to select, THEN press ENTER." 17 50 8 \
+      "16127" "" ON \
+      "16137" "" OFF \
+      "16147" "" OFF \
+      "16157" "" OFF \
+      "16167" "" OFF \
+      "16177" "" OFF \
+      "16187" "" OFF \
+      "16197" "" OFF 3>&1 1>&2 2>&3)
+  else
+    enable_upnp="0"
+    gateway_ip=""
+    upnp_port=""
+  fi
     
   if whiptail --yesno "Would you like enable alert notification?" 8 65; then
 
@@ -895,18 +577,15 @@ fi
 
   index_from_file="$index"
   tx_from_file="$outpoint"
-  stak_info=$(curl -s -m 5 https://explorer.runonflux.io/api/tx/$tx_from_file | jq -r ".vout[$index_from_file] | .value,.n,.scriptPubKey.addresses[0],.spentTxId" | paste - - - - | awk '{printf "%0.f %d %s %s\n",$1,$2,$3,$4}' | grep 'null' | egrep -o '10000|25000|100000|1000|12500|40000')
+  stak_info=$(curl -sSL -m 5 https://explorer.zelcash.online/api/tx/$tx_from_file | jq -r ".vout[$index_from_file] | .value,.n,.scriptPubKey.addresses[0],.spentTxId" | paste - - - - | awk '{printf "%0.f %d %s %s\n",$1,$2,$3,$4}' | grep 'null' | egrep -o '1000|12500|40000')
 	
 if [[ "$stak_info" == "" ]]; then
-    stak_info=$(curl -s -m 5 https://explorer.zelcash.online/api/tx/$tx_from_file | jq -r ".vout[$index_from_file] | .value,.n,.scriptPubKey.addresses[0],.spentTxId" | paste - - - - | awk '{printf "%0.f %d %s %s\n",$1,$2,$3,$4}' | grep 'null' | egrep -o '10000|25000|100000|1000|12500|40000')
+    stak_info=$(curl -sSL -m 5 https://explorer.zelcash.online/api/tx/$tx_from_file | jq -r ".vout[$index_from_file] | .value,.n,.scriptPubKey.addresses[0],.spentTxId" | paste - - - - | awk '{printf "%0.f %d %s %s\n",$1,$2,$3,$4}' | grep 'null' | egrep -o '1000|12500|40000')
 fi	
 
 if [[ $stak_info == ?(-)+([0-9]) ]]; then
 
   case $stak_info in
-   "10000") eps_limit=90 ;;
-   "25000")  eps_limit=180 ;;
-   "100000") eps_limit=300 ;;
    "1000") eps_limit=90 ;;
    "12500")  eps_limit=180 ;;
    "40000") eps_limit=300 ;;
@@ -970,7 +649,10 @@ sudo chown $USER:$USER /home/$USER/install_conf.json
   "telegram_alert": "${telegram_alert}",
   "telegram_bot_token": "${telegram_bot_token}",
   "telegram_chat_id": "${telegram_chat_id}",
-  "eps_limit": "${eps_limit}"
+  "eps_limit": "${eps_limit}",
+  "enable_upnp": "${enable_upnp}",
+  "upnp_port": "${FLUX_PORT}",
+  "gateway_ip": "${gateway_ip}"
 }
 EOF
 
@@ -1010,7 +692,7 @@ sudo rm -rf /home/$USER/watchdog  > /dev/null 2>&1
 echo -e "${ARROW} ${CYAN}Downloading...${NC}"
 cd && git clone https://github.com/RunOnFlux/fluxnode-watchdog.git watchdog > /dev/null 2>&1
 echo -e "${ARROW} ${CYAN}Installing git hooks....${NC}"
-wget https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/post-merge > /dev/null 2>&1
+wget https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/$ROOT_BRANCH/post-merge > /dev/null 2>&1
 mv post-merge /home/$USER/watchdog/.git/hooks/post-merge
 sudo chmod +x /home/$USER/watchdog/.git/hooks/post-merge
 echo -e "${ARROW} ${CYAN}Installing watchdog module....${NC}"
@@ -1184,19 +866,16 @@ fi
 if [[ -f /home/$USER/$CONFIG_DIR/$CONFIG_FILE ]]; then
   index_from_file=$(grep -w zelnodeindex /home/$USER/$CONFIG_DIR/$CONFIG_FILE | sed -e 's/zelnodeindex=//')
   tx_from_file=$(grep -w zelnodeoutpoint /home/$USER/$CONFIG_DIR/$CONFIG_FILE | sed -e 's/zelnodeoutpoint=//')
-  stak_info=$(curl -s -m 5 https://explorer.runonflux.io/api/tx/$tx_from_file | jq -r ".vout[$index_from_file] | .value,.n,.scriptPubKey.addresses[0],.spentTxId" | paste - - - - | awk '{printf "%0.f %d %s %s\n",$1,$2,$3,$4}' | grep 'null' | egrep -o '10000|25000|100000|1000|12500|40000')
+  stak_info=$(curl -s -m 5 https://explorer.zelcash.online/api/tx/$tx_from_file | jq -r ".vout[$index_from_file] | .value,.n,.scriptPubKey.addresses[0],.spentTxId" | paste - - - - | awk '{printf "%0.f %d %s %s\n",$1,$2,$3,$4}' | grep 'null' | egrep -o '1000|12500|40000')
 	
     if [[ "$stak_info" == "" ]]; then
-      stak_info=$(curl -s -m 5 https://explorer.zelcash.online/api/tx/$tx_from_file | jq -r ".vout[$index_from_file] | .value,.n,.scriptPubKey.addresses[0],.spentTxId" | paste - - - - | awk '{printf "%0.f %d %s %s\n",$1,$2,$3,$4}' | grep 'null' | egrep -o '10000|25000|100000|1000|12500|40000')
+      stak_info=$(curl -s -m 5 https://explorer.zelcash.online/api/tx/$tx_from_file | jq -r ".vout[$index_from_file] | .value,.n,.scriptPubKey.addresses[0],.spentTxId" | paste - - - - | awk '{printf "%0.f %d %s %s\n",$1,$2,$3,$4}' | grep 'null' | egrep -o '1000|12500|40000')
     fi	
 fi
 
 if [[ $stak_info == ?(-)+([0-9]) ]]; then
 
   case $stak_info in
-   "10000") eps_limit=90 ;;
-   "25000")  eps_limit=180 ;;
-   "100000") eps_limit=300 ;;
    "1000") eps_limit=90 ;;
    "12500")  eps_limit=180 ;;
    "40000") eps_limit=300 ;;
@@ -1241,109 +920,6 @@ fi
 echo
 }
 
-
-function kda_bootstrap() {
-
-    echo -e "${GREEN}Module: Restore Kadena node blockchain from bootstrap${NC}"
-    echo -e "${YELLOW}================================================================${NC}"
-
-if [[ "$USER" == "root" || "$USER" == "ubuntu" || "$USER" == "admin" ]]; then 
-        echo -e "${CYAN}You are currently logged in as ${GREEN}$USER${NC}"
-        echo -e "${CYAN}Please switch to the user account.${NC}"
-        echo -e "${YELLOW}================================================================${NC}"
-        echo -e "${NC}"
-        exit
-    fi
-    
-    echo -e "${NC}"
-    sudo chown -R $USER:$USER /home/$USER/$FLUX_DIR
-    echo -e "${ARROW} ${CYAN}Stopping Kadena Node...${NC}"
-    
-    docker stop zelKadenaChainWebNode > /dev/null 2>&1 && sleep 10
-
-    if [[ -d /home/$USER/$FLUX_DIR/$FLUX_APPS_DIR/zelKadenaChainWebNode/chainweb-db  ]]; then
-        echo -e "${ARROW} ${CYAN}Cleaning...${NC}"
-        sudo rm -rf /home/$USER/$FLUX_DIR/$FLUX_APPS_DIR/zelKadenaChainWebNode/chainweb-db
-    fi
-    
-     mkdir -p /home/$USER/$FLUX_DIR/$FLUX_APPS_DIR/zelKadenaChainWebNode/chainweb-db/0  
-
-
-    if [ -f "/home/$USER/$KDA_BOOTSTRAP_ZIPFILE" ]; then
-           
-        echo -e "${ARROW} ${CYAN}Local bootstrap file detected...${NC}"
-	if whiptail --yesno "Do u want check vailidation of archive file before unpack?" 8 60 3>&1 1>&2 2>&3; then
-            check_tar "/home/$USER/$KDA_BOOTSTRAP_ZIPFILE"   
-	else
-	    echo -e "${ARROW} ${CYAN}Vailidation of archive file skipped..${NC}"
-        fi
-	
-    fi
-
-
-    if [ -f "/home/$USER/$KDA_BOOTSTRAP_ZIPFILE" ]; then
-    
-	tar_file_unpack "/home/$USER/$KDA_BOOTSTRAP_ZIPFILE" "/home/$USER/$FLUX_DIR/$FLUX_APPS_DIR/zelKadenaChainWebNode/chainweb-db/0"
-	sleep 2
-        #unzip -o $KDA_BOOTSTRAP_ZIPFILE -d /home/$USER/$FLUX_DIR/$FLUX_APPS_DIR/zelKadenaChainWebNode > /dev/null 2>&1
-	
-    else
-
-        echo -e "${ARROW} ${CYAN}Bootstrap file downloading...${NC}" && sleep 2
-
-        CHOICE=$(
-        whiptail --title "Bootstrap installation" --menu "Choose a method how to get bootstrap file" 10 47 2  \
-            "1)" "Download from source build in script" \
-            "2)" "Download from own source" 3>&2 2>&1 1>&3
-        )
-
-
-            case $CHOICE in
-	    "1)")   
-	         DB_HIGHT=$(curl -s -m 15 https://fluxnodeservice.com/kda_bootstrap.json | jq -r '.block_height')
-		 if [[ "$DB_HIGHT" == "" ]]; then
-		     DB_HIGHT=$(curl -s -m 15 https://fluxnodeservice.com/kda_bootstrap.json | jq -r '.block_height')
-		 fi
-		 echo -e "${ARROW} ${CYAN}KDA Bootstrap height: ${GREEN}$DB_HIGHT${NC}"
-		 echo -e "${ARROW} ${CYAN}Downloading File: ${GREEN}$KDA_BOOTSTRAP_ZIP ${NC}"
-       		 wget -O $KDA_BOOTSTRAP_ZIPFILE $KDA_BOOTSTRAP_ZIP -q --show-progress
-		 tar_file_unpack "/home/$USER/$KDA_BOOTSTRAP_ZIPFILE" "/home/$USER/$FLUX_DIR/$FLUX_APPS_DIR/zelKadenaChainWebNode/chainweb-db/0" 
-		 sleep 2
-
-	    ;;
-	    "2)")   
-  		 KDA_BOOTSTRAP_ZIP="$(whiptail --title "Kadena node bootstrap source (*.tar.gz, *.zip file supported)" --inputbox "Enter your URL" 8 72 3>&1 1>&2 2>&3)"
-		 KDA_BOOTSTRAP_ZIPFILE="${KDA_BOOTSTRAP_ZIP##*/}"
-		 echo -e "${ARROW} ${CYAN}Downloading File: ${GREEN}$KDA_BOOTSTRAP_ZIP ${NC}"
-		 wget -O $KDA_BOOTSTRAP_ZIPFILE $KDA_BOOTSTRAP_ZIP -q --show-progress	
-		 
-		 if [[ "$BOOTSTRAP_ZIPFILE" == *".zip"* ]]; then
- 		    echo -e "${ARROW} ${YELLOW}Unpacking wallet bootstrap please be patient...${NC}"
-                    unzip -o $KDA_BOOTSTRAP_ZIPFILE -d /home/$USER/$FLUX_DIR/$FLUX_APPS_DIR/zelKadenaChainWebNode/chainweb-db/0 > /dev/null 2>&1
-		else	       
-		    tar_file_unpack "/home/$USER/$KDA_BOOTSTRAP_ZIPFILE" "/home/$USER/$FLUX_DIR/$FLUX_APPS_DIR/zelKadenaChainWebNode/chainweb-db/0"
-		   
-		fi		
-		  sleep 2
-	    ;;
-            esac
-
-    fi
-
-    if whiptail --yesno "Would you like remove bootstrap archive file?" 8 60; then
-        rm -rf $KDA_BOOTSTRAP_ZIPFILE
-    fi
-
-    docker start zelKadenaChainWebNode > /dev/null 2>&1
-    NUM='15'
-    MSG1='Starting Kadena Node...'
-    MSG2="${CYAN}........................[${CHECK_MARK}${CYAN}]${NC}"
-    spinning_timer
-    echo -e "" 
-    echo -e "${ARROW} ${CYAN}Kadena Node initial process can take about ~15min. ${NC}"
-    echo -e "" 
-
-}
 
 
 function flux_daemon_bootstrap() {
@@ -1493,206 +1069,6 @@ function flux_daemon_bootstrap() {
     pm2 start watchdog --watch > /dev/null 2>&1 && sleep 2
 }
 
-function mongodb_bootstrap(){
-
-echo -e "${GREEN}Module: Restore Flux MongoDB datatable from bootstrap (explorer only)${NC}"
-echo -e "${YELLOW}================================================================${NC}"
-echo -e "${ARROW} ${CYAN}Module disabled...${NC}"
-echo -e ""
-exit
-
-if [[ "$USER" == "root" || "$USER" == "ubuntu" || "$USER" == "admin" ]]; then
-    echo -e "${CYAN}You are currently logged in as ${GREEN}$USER${NC}"
-    echo -e "${CYAN}Please switch to the user account.${NC}"
-    echo -e "${YELLOW}================================================================${NC}"
-    echo -e "${NC}"
-    exit
-fi
-
-sudo rm /home/$USER/fluxdb_dump.tar.gz  > /dev/null 2>&1
-sudo rm /home/$USER/$BOOTSTRAP_ZIPFILE_MONGOD  > /dev/null 2>&1
-
-if ! pm2 -v > /dev/null 2>&1; then
- 
-   pm2_install 
-
-   if [[ "$PM2_INSTALL" == "0" ]]; then
-    exit
-   fi
-
-fi
-
-WANIP=$(wget http://ipecho.net/plain -O - -q)
-
-DB_HIGHT=$(curl -s -m 10 https://fluxnodeservice.com/mongodb_bootstrap.json | jq -r '.block_height')
-if [[ "$DB_HIGHT" == "" ]]; then
-   DB_HIGHT=$(curl -s -m 10 https://fluxnodeservice.com/mongodb_bootstrap.json | jq -r '.block_height')
-fi
-
-BLOCKHIGHT=$(curl -s -m 5 http://"$WANIP":16127/explorer/scannedheight | jq '.data.generalScannedHeight')	
-FORCE_BOOTSTRAP=0
-
-if [[ "$DB_HIGHT" == "" ]]; then
-    echo -e "${ARROW} ${CYAN}MongoDB bootstrap server offline...${NC}"
-    string_limit_x_mark "Operation aborted....................."
-    exit
-fi
-
-
-if [[ "$BLOCKHIGHT" == ""  ||  "$BLOCKHIGHT" == "null" ]]; then
-
-    if whiptail --yesno "Local Explorer not respondin...Would you like force bootstrap installation?" 8 60; then   
-        FORCE_BOOTSTRAP=1		
-    else
-        string_limit_x_mark "Local Explorer not responding........."
-        string_limit_x_mark "Operation aborted....................."	
-        echo -e ""
-        exit  
-    fi
-
-fi
-   
- if [[ "$FORCE_BOOTSTRAP" != "1" ]]; then	
-
-    if [[ "$BLOCKHIGHT" == "null" ]]; then
-
-           message=$(curl -s -m 5 http://"$WANIP":16127/explorer/scannedheight | jq -r .data.message)
-        
-           if whiptail --yesno "Flux explorer error noticed...Would you like force bootstrap installation?" 8 60; then 
-              FORCE_BOOTSTRAP=1
-           else
-	      echo -e "${ARROW} ${CYAN}Flux explorer error: ${RED}$message${NC}"
-              string_limit_x_mark "Operation aborted....................."
-              echo -e ""
-	      exit
-	   fi  
-      fi
- fi
-
-
-if [[ "$BLOCKHIGHT" != "" && "$BLOCKHIGHT" != "null" ]]; then
-
-        if [[ "$BLOCKHIGHT" -gt "$DB_HIGHT" ]]; then
-	  
-	    if whiptail --yesno "Datatable is out of date....Would you like force bootstrap installation?" 8 60; then   
-                FORCE_BOOTSTRAP=1		
-            else
-                echo -e "${ARROW} ${CYAN}Current Node block hight ${RED}$BLOCKHIGHT${CYAN} > Bootstrap block hight ${RED}$DB_HIGHT${CYAN}. Datatable is out of date.${NC}"
-	        string_limit_x_mark "Operation aborted....................."
-                echo -e ""
-	        exit
-            fi
-	  
-        fi	         
-fi
-
-
-echo -e "${ARROW} ${CYAN}IP: ${RED}$WANIP${NC}"
-
-if [[ "$FORCE_BOOTSTRAP" != "1" ]]; then
-    echo -e "${ARROW} ${CYAN}Node block hight: ${GREEN}$BLOCKHIGHT${NC}"
-fi
-
-echo -e "${ARROW} ${CYAN}Bootstrap block hight: ${GREEN}$DB_HIGHT${NC}"
-echo -e ""
-
-
-echo -e "${ARROW} ${CYAN}Downloading File: ${GREEN}$BOOTSTRAP_URL_MONGOD${NC}"
-wget $BOOTSTRAP_URL_MONGOD -q --show-progress 
-echo -e "${ARROW} ${CYAN}Unpacking...${NC}"
-tar xvf $BOOTSTRAP_ZIPFILE_MONGOD -C /home/$USER > /dev/null 2>&1 && sleep 1
-echo -e "${ARROW} ${CYAN}Stoping Flux...${NC}"
-pm2 stop flux > /dev/null 2>&1
-echo -e "${ARROW} ${CYAN}Importing mongodb datatable...${NC}"
-mongorestore --port 27017 --db zelcashdata /home/$USER/dump/zelcashdata --drop > /dev/null 2>&1
-echo -e "${ARROW} ${CYAN}Cleaning...${NC}"
-sudo rm -rf /home/$USER/dump > /dev/null 2>&1 && sleep 1
-sudo rm -rf $BOOTSTRAP_ZIPFILE_MONGOD > /dev/null 2>&1  && sleep 1
-pm2 start flux > /dev/null 2>&1
-pm2 save > /dev/null 2>&1
-
-NUM='120'
-MSG1='Flux starting...'
-MSG2="${CYAN}.....................[${CHECK_MARK}${CYAN}]${NC}"
-spinning_timer
-echo
-
-#BLOCKHIGHT_AFTER_BOOTSTRAP=$(curl -s -m 3 http://"$WANIP":16127/explorer/scannedheight | jq '.data.generalScannedHeight')
-BLOCKHIGHT_AFTER_BOOTSTRAP=$(mongoexport -d zelcashdata -c scannedheight  --jsonArray --pretty --quiet | jq -r .[].generalScannedHeight)	
- if [[ "$BLOCKHIGHT_AFTER_BOOTSTRAP" != "" && "$BLOCKHIGHT_AFTER_BOOTSTRAP" != "null" ]]; then
- 
-             echo -e "${ARROW} ${CYAN}Node block hight after restored: ${GREEN}$BLOCKHIGHT_AFTER_BOOTSTRAP${NC}"
-	    
-	     if [[ "$BLOCKHIGHT_AFTER_BOOTSTRAP" -ge  "$DB_HIGHT" ]]; then
-
-                 string_limit_check_mark "MongoDB bootstrap installed successful.................................."
-                 echo -e ""
-             else
-	     
-	         if [[ "$FORCE_BOOTSTRAP" == "1" ]]; then
-                    string_limit_check_mark "MongoDB bootstrap installed successful.................................."
-                    echo -e ""
-		 else
-		    string_limit_x_mark "MongoDB bootstrap installation failed.................................."
-                    echo -e ""
-		 fi
-		 
-             fi
- else
- 
-     string_limit_x_mark "MongoDB bootstrap installation failed.................................."
-     echo -e ""
- 
- fi
-	
-	
-}
-
-function install_kernel(){
-
-
-echo -e "${GREEN}Module: Install Linux Kernel 5.X for Ubuntu 18.04${NC}"
-echo -e "${YELLOW}================================================================${NC}"
-
-if [[ "$USER" == "root" ]]
-then
-    echo -e "${CYAN}You are currently logged in as ${GREEN}$USER${NC}"
-    echo -e "${CYAN}Please switch to the user account.${NC}"
-    echo -e "${YELLOW}================================================================${NC}"
-    echo -e "${NC}"
-    exit
-fi
-
-echo -e "${NC}"
-echo -e "${YELLOW}Installing Linux Kernel 5.x${NC}"
-sudo apt-get install --install-recommends linux-generic-hwe-18.04 -y
-read -p "Would you like to reboot pc Y/N?" -n 1 -r
-echo -e "${NC}"
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-sudo reboot -n
-fi
-
-}
-
-function analyzer_and_fixer(){
-
-echo -e "${GREEN}Module: FluxNode analyzer and fixer${NC}"
-echo -e "${YELLOW}================================================================${NC}"
-
-if [[ "$USER" == "root" || "$USER" == "ubuntu" || "$USER" == "admin" ]]; then
-    echo -e "${CYAN}You are currently logged in as ${GREEN}$USER${NC}"
-    echo -e "${CYAN}Please switch to the user account.${NC}"
-    echo -e "${YELLOW}================================================================${NC}"
-    echo -e "${NC}"
-    exit
-fi
-
-bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/nodeanalizerandfixer.sh)
-
-
-}
-
 
 function install_node(){
 
@@ -1708,7 +1084,13 @@ if [[ "$USER" == "root" || "$USER" == "ubuntu" || "$USER" == "admin" ]]; then
 fi
 
 if [[ $(lsb_release -d) != *Debian* && $(lsb_release -d) != *Ubuntu* ]]; then
+   echo -e "${WORNING} ${CYAN}ERROR: ${RED}OS version not supported${NC}"
+   echo -e "${WORNING} ${CYAN}Installation stopped...${NC}"
+   echo
+   exit
+fi
 
+if [[ $(lsb_release -cs) == "jammy" ]]; then
    echo -e "${WORNING} ${CYAN}ERROR: ${RED}OS version not supported${NC}"
    echo -e "${WORNING} ${CYAN}Installation stopped...${NC}"
    echo
@@ -1725,45 +1107,11 @@ exit
 fi
 
 
-bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/install_pro.sh)
+bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/${ROOT_BRANCH}/install_pro.sh)
 
 
 }
 
-
-function multinode(){
-
-echo -e "${GREEN}Module: Multinode configuration with UPNP communication (Needs Router with UPNP support)${NC}"
-echo -e "${YELLOW}================================================================${NC}"
-
-if [[ "$USER" == "root" || "$USER" == "ubuntu" || "$USER" == "admin" ]]; then
-    echo -e "${CYAN}You are currently logged in as ${GREEN}$USER${NC}"
-    echo -e "${CYAN}Please switch to the user account.${NC}"
-    echo -e "${YELLOW}================================================================${NC}"
-    echo -e "${NC}"
-    exit
-fi
-    
-    echo -e ""
-    echo -e "${ARROW}  ${CYAN}OPTION ALLOWS YOU: ${NC}"
-    echo -e "${HOT} ${CYAN}Run node as selfhosting with upnp communication ${NC}"
-    echo -e "${HOT} ${CYAN}Create up to 8 node using same public address ${NC}"
-    echo -e ""
-    echo -e "${ARROW}  ${RED}IMPORTANT:${NC}"
-    echo -e "${BOOK} ${RED}Each node need to set different port for communication${NC}"
-    echo -e "${BOOK} ${RED}If FluxOs fails to communicate with router or upnp fails it will shutdown FluxOS... ${NC}"
-    echo -e ""
-    echo -e "${YELLOW}================================================================${NC}"
-    echo -e ""
-    
-    if [[ ! -f /home/$USER/zelflux/config/userconfig.js ]]; then
-      echo -e "${WORNING} ${CYAN}First install FluxNode...${NC}"
-      echo -e "${WORNING} ${CYAN}Operation stopped...${NC}"
-      echo -e ""      
-    else      
-      bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/multinode.sh)
-    fi  
-}
 
 function install_docker(){
 
@@ -1789,8 +1137,20 @@ if [[ $(lsb_release -d) != *Debian* && $(lsb_release -d) != *Ubuntu* ]]; then
 
 fi
 
-usernew="$(whiptail --title "MULTITOOLBOX $dversion" --inputbox "Enter your username" 8 72 3>&1 1>&2 2>&3)"
-usernew=$(awk '{print tolower($0)}' <<< "$usernew")
+if [[ $(lsb_release -cs) == "jammy" ]]; then
+   echo -e "${WORNING} ${CYAN}ERROR: ${RED}OS version not supported${NC}"
+   echo -e "${WORNING} ${CYAN}Installation stopped...${NC}"
+   echo
+   exit
+fi
+
+if [[ -z "$usernew" ]]; then
+  usernew="$(whiptail --title "MULTITOOLBOX $dversion" --inputbox "Enter your username" 8 72 3>&1 1>&2 2>&3)"
+  usernew=$(awk '{print tolower($0)}' <<< "$usernew")
+else
+  echo -e "${PIN}${CYAN} Import docker user '$usernew' from environment variable............[${CHECK_MARK}${CYAN}]${NC}" && sleep 1
+fi
+
 echo -e "${ARROW} ${CYAN}New User: ${GREEN}${usernew}${NC}"
 adduser --gecos "" "$usernew" 
 usermod -aG sudo "$usernew" > /dev/null 2>&1  
@@ -2138,23 +1498,45 @@ EOF
     sudo chown root:root /etc/systemd/system/zelcash.service
 }
 
+function replace_kadena {
+
+ while true
+  do
+   KDA_A=$(whiptail --inputbox "Please enter your Kadena address from Zelcore" 8 85 3>&1 1>&2 2>&3)
+   kda_address="kadena:$KDA_A?chainid=0"
+   if [[ "$KDA_A" == "" ]]; then
+     echo -e "${WORNING} ${CYAN}Kadena address can't be empty string, operation aborted...${NC}"
+     echo -e ""
+     exit
+   fi
+   break
+ done
+
+
+if [[ $(cat /home/$USER/zelflux/config/userconfig.js | grep "kadena") != "" ]]; then
+
+  sed -i "s/$(grep -e kadena /home/$USER/zelflux/config/userconfig.js)/kadena: '$kda_address',/" /home/$USER/zelflux/config/userconfig.js
+
+  if [[ $(grep -w $KDA_A /home/$USER/zelflux/config/userconfig.js) != "" ]]; then
+     echo -e "${ARROW} ${CYAN}Kadena address replaced successfully...................[${CHECK_MARK}${CYAN}]${NC}"
+  fi
+
+else
+
+   insertAfter "/home/$USER/zelflux/config/userconfig.js" "zelid" "kadena: '$kda_address',"
+   echo -e "${ARROW} ${CYAN}Kadena address set successfully........................[${CHECK_MARK}${CYAN}]${NC}"
+
+fi
+
+
+}
+
 
 function replace_zelid() {
 
- echo -e "${GREEN}Module: Replace Zel ID${NC}"
- echo -e "${YELLOW}================================================================${NC}"
- 
-if [[ "$USER" == "root" || "$USER" == "ubuntu" || "$USER" == "admin" ]]; then
-    echo -e "${CYAN}You are currently logged in as ${GREEN}$USER${NC}"
-    echo -e "${CYAN}Please switch to the user account.${NC}"
-    echo -e "${YELLOW}================================================================${NC}"
-    echo -e "${NC}"
-    exit
- fi 
-
 while true
   do
-  
+
     new_zelid="$(whiptail --title "MULTITOOLBOX" --inputbox "Enter your ZEL ID from ZelCore (Apps -> Zel ID (CLICK QR CODE)) " 8 72 3>&1 1>&2 2>&3)"
 
     if [ $(printf "%s" "$new_zelid" | wc -c) -eq "34" ] || [ $(printf "%s" "$new_zelid" | wc -c) -eq "33" ]; then
@@ -2164,21 +1546,60 @@ while true
       string_limit_x_mark "Zel ID is not valid try again..........................................."
       sleep 2
    fi
-   
+
   done
-   
+
   if [[ $(grep -w $new_zelid /home/$USER/zelflux/config/userconfig.js) != "" ]]; then
-     echo -e "${ARROW} ${CYAN}Replace ZEL ID skipped........................[${CHECK_MARK}${CYAN}]${NC}"
+     echo -e "${ARROW} ${CYAN}Replace ZEL ID skipped............................[${CHECK_MARK}${CYAN}]${NC}"
    else
         sed -i "s/$(grep -e zelid /home/$USER/zelflux/config/userconfig.js)/zelid:'$new_zelid',/" /home/$USER/zelflux/config/userconfig.js
 
         if [[ $(grep -w $new_zelid /home/$USER/zelflux/config/userconfig.js) != "" ]]; then
-                        echo -e "${ARROW} ${CYAN}ZEL ID replaced successful.....................[${CHECK_MARK}${CYAN}]${NC}"
+                        echo -e "${ARROW} ${CYAN}ZEL ID replaced successful........................[${CHECK_MARK}${CYAN}]${NC}"
         fi
-
    fi
 
 }
+
+
+function fluxos_reconfiguration {
+
+ echo -e "${GREEN}Module: FluxOS reconfiguration${NC}"
+ echo -e "${YELLOW}================================================================${NC}"
+
+ if [[ "$USER" == "root" || "$USER" == "ubuntu" || "$USER" == "admin" ]]; then
+    echo -e "${CYAN}You are currently logged in as ${GREEN}$USER${NC}"
+    echo -e "${CYAN}Please switch to the user account.${NC}"
+    echo -e "${YELLOW}================================================================${NC}"
+    echo -e "${NC}"
+    exit
+ fi
+
+ if ! [[ -f /home/$USER/zelflux/config/userconfig.js ]]; then
+   echo -e "${WORNING} ${CYAN}FluxOS userconfig.js not exist, operation aborted${NC}"
+   echo -e ""
+   exit
+ fi
+
+
+ CHOICE=$(
+ whiptail --title "FluxOS Configuration" --menu "Make your choice" 15 40 6 \
+ "1)" "Replace ZELID"   \
+ "2)" "Add/Replace kadena address"  3>&2 2>&1 1>&3
+ )
+
+
+case $CHOICE in
+        "1)")
+         replace_zelid
+        ;;
+        "2)")
+         replace_kadena
+        ;;
+esac
+
+}
+
 
  function install_watchtower(){
  
@@ -2252,109 +1673,6 @@ fi
  
  }
 
- function selfhosting() {
- 
- echo -e "${GREEN}Module: Self-hosting ip cron service${NC}"
- echo -e "${YELLOW}================================================================${NC}"
- 
-if [[ "$USER" == "root" || "$USER" == "ubuntu" || "$USER" == "admin" ]]; then
-    echo -e "${CYAN}You are currently logged in as ${GREEN}$USER${NC}"
-    echo -e "${CYAN}Please switch to the user account.${NC}"
-    echo -e "${YELLOW}================================================================${NC}"
-    echo -e "${NC}"
-    exit
- fi 
- 
- echo -e "${ARROW} ${CYAN}Adding IP...${NC}" && sleep 1
- get_ip
- device_name=$(ip addr | grep 'BROADCAST,MULTICAST,UP,LOWER_UP' | head -n1 | awk '{print $2}' | sed 's/://' | sed 's/@/ /' | awk '{print $1}')
- 
-  if [[ "$device_name" != "" && "$WANIP" != "" ]]; then
-    sudo ip addr add $WANIP dev $device_name:0  > /dev/null 2>&1
-  else
-    echo -e "${WORNING} ${CYAN}Problem detected operation stopped! ${NC}" && sleep 1
-    echo -e ""
-    exit
-  fi
- 
- 
-echo -e "${ARROW} ${CYAN}Creating ip check script...${NC}" && sleep 1
-sudo rm /home/$USER/ip_check.sh > /dev/null 2>&1
-sudo touch /home/$USER/ip_check.sh
-sudo chown $USER:$USER /home/$USER/ip_check.sh
-    cat <<'EOF' > /home/$USER/ip_check.sh
-#!/bin/bash
-
-function get_ip(){
-
- WANIP=$(curl --silent -m 10 https://api4.my-ip.io/ip | tr -dc '[:alnum:].')
-    
-  if [[ "$WANIP" == "" ]]; then
-   WANIP=$(curl --silent -m 10 https://checkip.amazonaws.com | tr -dc '[:alnum:].')    
-  fi  
-      
-  if [[ "$WANIP" == "" ]]; then
-   WANIP=$(curl --silent -m 10 https://api.ipify.org | tr -dc '[:alnum:].')
-  fi
-
-}
-
-
-if [[ $1 == "restart" ]]; then
-
-  # give 3min to connect with internet
-  sleep 180
-  get_ip
-  device_name=$(ip addr | grep 'BROADCAST,MULTICAST,UP,LOWER_UP' | head -n1 | awk '{print $2}' | sed 's/://' | sed 's/@/ /' | awk '{print $1}')
-
-  if [[ "$device_name" != "" && "$WANIP" != "" ]]; then
-   date_timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-   echo -e "New IP detected, IP: $WANIP was added at $date_timestamp" >> /home/$USER/ip_history.log
-   sudo ip addr add $WANIP dev $device_name:0 && sleep 2
-  fi
-
-fi
-
-if [[ $1 == "ip_check" ]]; then
-
-  get_ip
-  device_name=$(ip addr | grep 'BROADCAST,MULTICAST,UP,LOWER_UP' | head -n1 | awk '{print $2}' | sed 's/://' | sed 's/@/ /' | awk '{print $1}')
-  api_port=$(grep -w apiport /home/$USER/zelflux/config/userconfig.js | grep -o '[[:digit:]]*')
-  if [[ "$api_port" == "" ]]; then
-  api_port="16127"
-  fi
-  confirmed_ip=$(curl -SsL -m 10 http://localhost:$api_port/flux/info | jq -r .data.node.status.ip | sed -r 's/:.+//')
-  if [[ "$WANIP" != "" && "$confirmed_ip" != "" ]]; then
-
-    if [[ "$WANIP" != "$confirmed_ip" ]]; then
-      date_timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-      echo -e "New IP detected, IP: $WANIP was added at $date_timestamp" >> /home/$USER/ip_history.log
-      sudo ip addr add $WANIP dev $device_name:0 && sleep 2
-    fi
-
-  fi
-
-fi
-EOF
-
-sudo chmod +x /home/$USER/ip_check.sh
-echo -e "${ARROW} ${CYAN}Adding cron jobs...${NC}" && sleep 1
-
-#crontab_check=$(sudo cat /var/spool/cron/crontabs/$USER | grep -o ip_check | wc -l)
-sudo [ -f /var/spool/cron/crontabs/$USER ] && crontab_check=$(sudo cat /var/spool/cron/crontabs/$USER | grep -o ip_check | wc -l) || crontab_check=0
-
-if [[ "$crontab_check" == "0" ]]; then
-  (crontab -l -u "$USER" 2>/dev/null; echo "@reboot /home/$USER/ip_check.sh restart") | crontab -
-  (crontab -l -u "$USER" 2>/dev/null; echo "*/15 * * * * /home/$USER/ip_check.sh ip_check") | crontab -
-  echo -e "${ARROW} ${CYAN}Script installed! ${NC}" 
-else
-  echo -e "${ARROW} ${CYAN}Cron jobs already added! ${NC}" 
-  echo -e "${ARROW} ${CYAN}Script installed! ${NC}"
-fi
-echo -e "" 
- 
- }
-
 
 if ! figlet -v > /dev/null 2>&1
 then
@@ -2384,13 +1702,13 @@ fi
 
 if [[ $(cat /etc/bash.bashrc | grep 'multitoolbox' | wc -l) == "0" ]]; then
 echo "alias multitoolbox='bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/multitoolbox.sh)'" | sudo tee -a /etc/bash.bashrc
+echo "alias multitoolbox_testnet='bash -i <(curl -s https://raw.githubusercontent.com/RunOnFlux/fluxnode-multitool/master/multitoolbox_testnet.sh)'" | sudo tee -a /etc/bash.bashrc
 source /etc/bash.bashrc
 fi
 
 if ! wget --version > /dev/null 2>&1 ; then
    sudo apt install -y wget > /dev/null 2>&1 && sleep 2
 fi
-
 
 
 while [ condition ]
