@@ -47,7 +47,7 @@ function showIntro() {
  echo -e "\r\n${YELLOW} ======================= STORAGE INFORMATION ============================${WHITE}"
  lsblk | grep -E "^.*disk"
 
- echo -e "${WHITE}\n *** For Help and Support - fluxnodestore@gmail.com OR the DJ Mines Discord FLUX Node Channel ***" 
+ echo -e "${WHITE}\n *** For Help and Support - DJ Mines Discord FLUX Node Channel or Flux Community Support ONLY ***" 
  echo -e "${WHITE} *** NOTE: Type ${CYAN}\"start\"${WHITE} from the command prompt to get back to this menu at any time ***\n" 
 }
 
